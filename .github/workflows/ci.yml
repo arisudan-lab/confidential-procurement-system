@@ -1,0 +1,95 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Compact compiler
+        run: |
+          curl -sSL https://compact.midnight.network | bash
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Compile contract
+        run: npm run compile
+
+      - name: Run tests
+        run: npm test
+
+      - name: Type check
+        run: npm run build
+
+      - name: Build frontend
+        working-directory: ./frontend
+        run: |
+          npm ci
+          npm run build
+
+  contract-quality:
+    name: Contract Quality Checks
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Compact compiler
+        run: |
+          curl -sSL https://compact.midnight.network | bash
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Verify contract structure
+        run: |
+          echo "Checking contract exports..."
+          grep -q "export ledger" contracts/procurement.compact || exit 1
+          grep -q "export circuit" contracts/procurement.compact || exit 1
+          grep -q "export enum ProcurementStatus" contracts/procurement.compact || exit 1
+          echo "✓ Contract structure verified"
+
+      - name: Verify privacy model
+        run: |
+          echo "Checking privacy guarantees..."
+          # Verify bidAmount is NOT disclosed
+          if grep -q "disclose(bidAmount)" contracts/procurement.compact; then
+            echo "❌ Privacy violation: bidAmount should not be disclosed"
+            exit 1
+          fi
+          echo "✓ Privacy model verified"
+
+      - name: Verify generated artifacts
+        run: |
+          npm run compile
+          echo "Checking generated artifacts..."
+          test -f contracts/managed/procurement/zkir/createProcurement.zkir || exit 1
+          test -f contracts/managed/procurement/zkir/submitBid.zkir || exit 1
+          test -f contracts/managed/procurement/zkir/closeProcurement.zkir || exit 1
+          test -f contracts/managed/procurement/zkir/awardProcurement.zkir || exit 1
+          echo "✓ All circuit artifacts generated"
