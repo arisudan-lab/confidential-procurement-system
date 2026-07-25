@@ -314,12 +314,46 @@ nvm install 22
 nvm use 22
 ```
 
+## 🌐 Vercel Deployment
+
+This project is configured for Vercel deployment. The frontend will automatically build and deploy.
+
+### Deploy to Vercel
+
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Deploy
+vercel
+
+# Or deploy to production
+vercel --prod
+```
+
+### Vercel Configuration
+
+- **Build Command:** `cd frontend && npm install && npm run build`
+- **Output Directory:** `frontend/dist`
+- **Install Command:** `cd frontend && npm install`
+
+### Environment Variables on Vercel
+
+Set these in your Vercel project settings:
+
+| Variable | Value |
+|----------|-------|
+| `VITE_NETWORK` | `undeployed`, `preview`, or `preprod` |
+| `VITE_CONTRACT_ADDRESS` | Your deployed contract address |
+| `VITE_PROOF_SERVER_URL` | Proof server URL (e.g., `https://lace-proof-pub.preview.midnight.network`) |
+
 ## 📚 Resources
 
 - [Midnight Documentation](https://docs.midnight.network)
 - [Compact Language Guide](https://docs.midnight.network/compact)
 - [Lace Wallet](https://lace.io)
 - [Midnight Faucets](https://midnight-tmnight-preprod.nethermind.dev)
+- [Vercel Deployment Guide](https://vercel.com/docs/deployments/git)
 
 ## 📄 License
 
