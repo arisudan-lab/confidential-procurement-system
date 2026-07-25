@@ -2,141 +2,158 @@
 .bid-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 24px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .form-group label {
-  font-weight: 600;
-  color: #333;
-  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 15px;
+  letter-spacing: 0.02em;
 }
 
 .form-group input,
 .form-group textarea {
-  padding: 12px 16px;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
+  padding: 14px 18px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--midnight-border);
+  border-radius: 12px;
+  color: var(--text-primary);
   font-size: 15px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.3s ease;
   font-family: inherit;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: var(--text-muted);
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+  background: rgba(0, 0, 0, 0.4);
 }
 
 .form-group textarea {
   resize: vertical;
-  min-height: 100px;
+  min-height: 120px;
 }
 
 .help-text {
-  font-size: 12px;
-  color: #757575;
+  font-size: 13px;
+  color: var(--text-muted);
   font-style: italic;
+  margin-top: -4px;
 }
 
 .btn-submit {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
   color: white;
-  padding: 14px 28px;
+  padding: 16px 32px;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s ease;
-  margin-top: 8px;
+  transition: all 0.3s ease;
+  margin-top: 12px;
+  letter-spacing: 0.02em;
 }
 
 .btn-submit:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px var(--accent-glow);
 }
 
 .btn-submit:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
   transform: none;
+  background: var(--midnight-surface);
+  border: 1px solid var(--midnight-border);
+  box-shadow: none;
 }
 
 .result {
-  padding: 16px;
-  border-radius: 8px;
+  padding: 18px;
+  border-radius: 12px;
   font-weight: 500;
-  animation: slideIn 0.3s ease;
+  animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 @keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .result.success {
-  background: rgba(76, 175, 80, 0.1);
-  border: 1px solid rgba(76, 175, 80, 0.3);
-  color: #2e7d32;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #6ee7b7;
 }
 
 .result.error {
-  background: rgba(244, 67, 54, 0.1);
-  border: 1px solid rgba(244, 67, 54, 0.3);
-  color: #c62828;
+  background: rgba(244, 63, 94, 0.1);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  color: #fda4af;
 }
 
 .tx-id {
-  margin-top: 8px;
-  font-size: 12px;
-  font-family: 'Courier New', monospace;
-  opacity: 0.8;
+  font-size: 13px;
+  font-family: var(--font-mono);
+  opacity: 0.9;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 4px 8px;
+  border-radius: 6px;
+  word-break: break-all;
 }
 
 .privacy-notice {
-  background: rgba(102, 126, 234, 0.05);
-  border-left: 4px solid #667eea;
-  padding: 16px;
-  border-radius: 0 8px 8px 0;
-  margin-top: 16px;
+  background: rgba(168, 85, 247, 0.05);
+  border-left: 4px solid var(--accent-primary);
+  padding: 20px;
+  border-radius: 0 12px 12px 0;
+  margin-top: 24px;
 }
 
 .privacy-notice.highlight {
-  background: rgba(156, 39, 176, 0.05);
-  border-left-color: #9c27b0;
+  background: rgba(59, 130, 246, 0.05);
+  border-left-color: var(--accent-secondary);
 }
 
 .privacy-notice p {
   margin: 0 0 12px 0;
   font-weight: 600;
-  color: #667eea;
+  color: #d8b4fe; /* Light purple */
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .privacy-notice.highlight p {
-  color: #9c27b0;
+  color: #93c5fd; /* Light blue */
 }
 
 .privacy-notice ul {
   margin: 0;
   padding-left: 20px;
   font-size: 14px;
-  color: #555;
+  color: var(--text-secondary);
 }
 
 .privacy-notice li {
-  margin: 6px 0;
-  line-height: 1.5;
+  margin: 8px 0;
+  line-height: 1.6;
 }

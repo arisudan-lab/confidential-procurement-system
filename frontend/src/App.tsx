@@ -33,7 +33,7 @@ function App() {
         <p className="subtitle">Privacy-preserving sealed-bid auctions on Midnight</p>
       </header>
 
-      <div className="status-bar">
+      <div className="status-bar glass-panel">
         <NetworkStatus network={network} />
         {contractAddress && (
           <div className="contract-info">
@@ -55,17 +55,17 @@ function App() {
 
         {walletConnected ? (
           <div className="procurement-sections">
-            <section className="procurement-card">
+            <section className="procurement-card glass-panel">
               <h2>Create Procurement Request</h2>
               <ProcurementForm />
             </section>
 
-            <section className="procurement-card">
+            <section className="procurement-card glass-panel">
               <h2>Submit Confidential Bid</h2>
               <BidForm />
             </section>
 
-            <section className="procurement-card full-width">
+            <section className="procurement-card full-width glass-panel">
               <h2>Procurement State</h2>
               <ProcurementState contractAddress={contractAddress} />
             </section>
