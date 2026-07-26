@@ -1,0 +1,27 @@
+import express from 'express';
+import cors from 'cors';
+import { pinoHttp } from 'pino-http';
+import { errorHandler } from './middlewares/errorHandler.js';
+
+// Routes
+import tenderRoutes from './routes/tender.routes.js';
+import bidRoutes from './routes/bid.routes.js';
+import walletRoutes from './routes/wallet.routes.js';
+import healthRoutes from './routes/health.routes.js';
+import configRoutes from './routes/config.routes.js';
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+app.use(pinoHttp());
+
+app.use('/api/tenders', tenderRoutes);
+app.use('/api/bids', bidRoutes);
+app.use('/api/wallet', walletRoutes);
+app.use('/api/health', healthRoutes);
+app.use('/api/config', configRoutes);
+
+app.use(errorHandler);
+
+export default app;
