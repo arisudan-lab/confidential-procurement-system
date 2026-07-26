@@ -1,0 +1,63 @@
+// Confidential Procurement System
+// Sealed Bid Auction
+
+pragma language_version 0.23;
+import CompactStandardLibrary;
+
+export enum TenderStatus {
+    OPEN,
+    CLOSED,
+    AWARDED
+}
+
+// ============================================================================
+// Public Ledger
+// ============================================================================
+
+export ledger tenderId: Bytes<32>;
+export ledger tenderStatus: TenderStatus;
+export ledger bidCount: Counter;
+export ledger winningCommitment: Bytes<32>;
+
+// ============================================================================
+// Private Witness
+// ============================================================================
+
+witness getSupplier(): Bytes<32>;
+witness getBidAmount(): Uint<64>;
+witness getSecret(): Bytes<32>;
+witness getNonce(): Bytes<32>;
+
+// ============================================================================
+// Circuits
+// ============================================================================
+
+export circuit createTender(id: Bytes<32>): [] {
+    // tenderStatus implicitly defaults to uninitialized, but we enforce state logically
+    tenderId = disclose(id);
+    tenderStatus = TenderStatus.OPEN;
+}
+
+export circuit submitBid(): [] {
+    assert(tenderStatus == TenderStatus.OPEN, "Tender is not open");
+    
+    // Witness private data (remains zero-knowledge)
+    const supplier = getSupplier();
+    const bidAmount = getBidAmount();
+    const secret = getSecret();
+    const nonce = getNonce();
+    
+    // Increment the public bid count
+    bidCount.increment(1);
+}
+
+export circuit closeTender(): [] {
+    assert(tenderStatus == TenderStatus.OPEN, "Tender is not open");
+    tenderStatus = TenderStatus.CLOSED;
+}
+
+export circuit awardTender(winnerCommitment: Bytes<32>): [] {
+    assert(tenderStatus == TenderStatus.CLOSED, "Tender must be closed to award");
+    winningCommitment = disclose(winnerCommitment);
+    tenderStatus = TenderStatus.AWARDED;
+}

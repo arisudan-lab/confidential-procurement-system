@@ -77,7 +77,12 @@ if (!fs.existsSync(contractPath)) {
 const Procurement = await import(pathToFileURL(contractPath).href);
 
 const compiledContract = CompiledContract.make('procurement', Procurement.Contract).pipe(
-  CompiledContract.withVacantWitnesses,
+  CompiledContract.withWitnesses({
+    getSupplier: (ctx: any) => [ctx.privateState, new Uint8Array(32)],
+    getBidAmount: (ctx: any) => [ctx.privateState, 0n],
+    getSecret: (ctx: any) => [ctx.privateState, new Uint8Array(32)],
+    getNonce: (ctx: any) => [ctx.privateState, new Uint8Array(32)],
+  }),
   CompiledContract.withCompiledFileAssets(zkConfigPath),
 );
 

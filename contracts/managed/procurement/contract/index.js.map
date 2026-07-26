@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "file": "index.js",
+  "sourceRoot": "../../../../",
+  "sources": ["contracts/procurement.compact"],
+  "names": [],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;EAGA;;;;;;;;;;;;;;;;;;;;;;MA+BA,AAAA,YAIC;;;;;cAJ2B,IAAa;;;;;;;;;;;;;;;;;;yCAAb,IAAa;;;;;;;yEAAb,IAAa;;;OAIxC;MAED,AAAA,SAWC;;;;;;;;;;;;;;;;;;;;;;OAAA;MAED,AAAA,WAGC;;;;;;;;;;;;;;;;;;;;;;OAAA;MAED,AAAA,WAIC;;;;;cAJ0B,kBAA2B;;;;;;;;;;;;;;;;;;yCAA3B,kBAA2B;;;;;;;;;6CAA3B,kBAA2B;;;OAIrD;;;;;;;;;;;;;;GACA;EA5DD;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;IAaA;;;;;;;;;yEAAkC;IAClC;;;;;;;;;yEAAyC;IACzC;;;;;;;;;yEAAgC;IAChC;;;;;;;;;yEAA2C;;;;;;;GA4C1C;EAtCD,AAAA,cAAiC;;0DAAjC,WAAiC;;;;;;;;;;;;;;GAAA;EACjC,AAAA,eAAiC;;0DAAjC,YAAiC;;;;;;;;;;;;;;GAAA;EACjC,AAAA,YAA+B;;0DAA/B,SAA+B;;;;;;;;;;;;;;GAAA;EAC/B,AAAA,WAA8B;;0DAA9B,QAA8B;;;;;;;;;;;;;;GAAA;EAM9B,AAAA,eAIC,4BAJ2B,IAAa;IAErC;;;;;;;2HAAoB,IAAE;;yEAAd;IACR;;;;;;;;;yEAAY;;GACf;EAED,AAAA,YAWC;oDAVU;;;;;;;;;;;yHAAY;;;;UAGb,UAAwB;UACxB,WAA0B;UAC1B,QAAoB;UACpB,OAAkB;UAGxB,KAAQ;IAAR;;;;;;;;;;6FAAA,KAAQ;;;;wEAAA;;GACX;EAED,AAAA,cAGC;oDAFU;;;;;;;;;;;yHAAY;;;;IACnB;;;;;;;;;yEAAY;;GACf;EAED,AAAA,cAIC,4BAJ0B,kBAA2B;oDAC3C;;;;;;;;;;;yHAAY;;;;IACnB;;;;;;;2HAA6B,kBAAgB;;yEAA5B;IACjB;;;;;;;;;yEAAY;;GACf;;;;;;;;;;;;;;;;IA9CD;qCAAA;;;;;;;;;;;0GAAkC;KAAA;IAClC;qCAAA;;;;;;;;;;;0GAAyC;KAAA;IACzC;qCAAA;;;;;;;;;;;0GAAgC;KAAA;IAChC;qCAAA;;;;;;;;;;;0GAA2C;KAAA;;;;;;;;;;;;;;;"
+}
