@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "workspaces": [
-    "frontend"
+    "frontend",
+    "backend"
   ],
   "scripts": {
     "compile": "node scripts/compile.mjs",
