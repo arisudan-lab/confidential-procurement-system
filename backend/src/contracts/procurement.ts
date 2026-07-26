@@ -5,6 +5,7 @@ import { WalletContext } from '../wallet/wallet.js';
 import { createProviders } from './providers.js';
 import { ContractAddress } from '@midnight-ntwrk/compact-runtime';
 import { CompiledContract } from '@midnight-ntwrk/midnight-js-protocol/compact-js';
+import { findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts';
 import pino from 'pino';
 
 const logger = pino();
@@ -63,4 +64,41 @@ export function getContract() {
     providers: currentProviders,
     compiledContract: currentCompiledContract
   };
+}
+
+export async function getBidCount(): Promise<string> {
+  if (!currentProviders || !activeContractAddress) throw new Error('Contract not initialized');
+  const __dirname = path.dirname(new URL(import.meta.url).pathname);
+  const contractPath = path.resolve(__dirname, '../../../../contracts/managed/procurement/contract/index.mjs');
+  let Procurement = await import(pathToFileURL(contractPath).href);
+  
+  const contractState = await currentProviders.publicDataProvider.queryContractState(activeContractAddress);
+  if (!contractState) return "0";
+  
+  const ledgerState = Procurement.ledger(contractState.data);
+  return ledgerState.bidCount.toString();
+}
+
+export async function submitBidContract(supplier: Uint8Array, amount: bigint, secret: Uint8Array, nonce: Uint8Array) {
+  if (!currentProviders || !activeContractAddress) throw new Error('Contract not initialized');
+  
+  const __dirname = path.dirname(new URL(import.meta.url).pathname);
+  const contractPath = path.resolve(__dirname, '../../../../contracts/managed/procurement/contract/index.mjs');
+  const zkConfigPath = path.resolve(__dirname, '../../../../contracts/managed/procurement/zkir');
+
+  let Procurement = await import(pathToFileURL(contractPath).href);
+
+  const configuredContract = CompiledContract.make('procurement', Procurement.Contract).pipe(
+    (CompiledContract as any).withWitnesses({
+      getSupplier: (ctx: any) => [ctx.privateState, supplier],
+      getBidAmount: (ctx: any) => [ctx.privateState, amount],
+      getSecret: (ctx: any) => [ctx.privateState, secret],
+      getNonce: (ctx: any) => [ctx.privateState, nonce],
+    }),
+    (CompiledContract as any).withCompiledFileAssets(zkConfigPath)
+  );
+
+  const contract = await findDeployedContract(currentProviders, activeContractAddress, configuredContract);
+  const tx = await contract.tx.submitBid();
+  return tx;
 }

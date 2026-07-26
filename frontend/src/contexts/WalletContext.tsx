@@ -70,6 +70,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
         isConnecting: false,
         error: error instanceof Error ? error : new Error(error.message || 'Failed to connect wallet')
       }));
+      throw error;
     }
   };
 

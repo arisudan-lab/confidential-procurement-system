@@ -1,11 +1,20 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { getContract } from '../contracts/procurement.js';
+import { getContract, getBidCount } from '../contracts/procurement.js';
 
 const router = Router();
 
 const asyncHandler = (fn: any) => (req: Request, res: Response, next: NextFunction) => {
   Promise.resolve(fn(req, res, next)).catch(next);
 };
+
+router.get('/state', asyncHandler(async (req: Request, res: Response) => {
+  try {
+    const bidCount = await getBidCount();
+    res.json({ success: true, bidCount });
+  } catch (err: any) {
+    res.status(500).json({ success: false, message: 'Failed to read contract state', error: err.message });
+  }
+}));
 
 router.post('/create', asyncHandler(async (req: Request, res: Response) => {
   const contractInfo = getContract();

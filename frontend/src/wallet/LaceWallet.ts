@@ -1,26 +1,28 @@
-import type { MidnightWalletApi } from './walletTypes';
+import '@midnight-ntwrk/dapp-connector-api';
+import type { ConnectedAPI } from '@midnight-ntwrk/dapp-connector-api';
 
 export class LaceWallet {
-  private api: MidnightWalletApi | null = null;
+  private api: ConnectedAPI | null = null;
 
   async isAvailable(): Promise<boolean> {
     return typeof window !== 'undefined' && !!window.midnight?.mnLace;
   }
 
   async isEnabled(): Promise<boolean> {
-    if (!await this.isAvailable()) return false;
-    return await window.midnight!.mnLace!.isEnabled();
+    return localStorage.getItem('midnight_lace_connected') === 'true';
   }
 
-  async connect(): Promise<MidnightWalletApi> {
+  async connect(): Promise<ConnectedAPI> {
     if (!await this.isAvailable()) {
       throw new Error('Lace wallet extension is not installed');
     }
 
     try {
-      this.api = await window.midnight!.mnLace!.enable();
+      this.api = await window.midnight!.mnLace!.connect('undeployed');
+      localStorage.setItem('midnight_lace_connected', 'true');
       return this.api;
     } catch (error: any) {
+      localStorage.removeItem('midnight_lace_connected');
       if (error.message && error.message.includes('user rejected')) {
         throw new Error('Connection rejected by user');
       }
@@ -30,25 +32,19 @@ export class LaceWallet {
 
   async getAddress(): Promise<string> {
     if (!this.api) throw new Error('Wallet not connected');
-    const addresses = await this.api.getUsedAddresses();
-    if (addresses.length === 0) {
-      const unused = await this.api.getUnusedAddresses();
-      if (unused.length === 0) throw new Error('No addresses found');
-      return unused[0];
-    }
-    return addresses[0];
+    const { unshieldedAddress } = await this.api.getUnshieldedAddress();
+    return unshieldedAddress;
   }
 
   async getNetwork(): Promise<string> {
     if (!this.api) throw new Error('Wallet not connected');
-    const networkId = await this.api.getNetworkId();
-    return networkId === 1 ? 'Mainnet' : 'Testnet';
+    const config = await this.api.getConfiguration();
+    return config.networkId;
   }
 
   disconnect() {
     this.api = null;
-    // Real wallet disconnection is usually handled by the user in the extension,
-    // but we can clear our local state.
+    localStorage.removeItem('midnight_lace_connected');
   }
 }
 
