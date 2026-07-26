@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Paperclip, Send, Loader2, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { Lock, Send, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { BidService } from '../../services/BidService';
 import { useWallet } from '../../contexts/WalletContext';
 
