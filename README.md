@@ -48,7 +48,25 @@
 |---|---|---|
 | **Live Web App** | `https://confidential-procurement-system-p50zjx47w.vercel.app/` | [Open Live App](https://confidential-procurement-system-p50zjx47w.vercel.app/) |
 | **Demo Video** | `https://youtu.be/HqOVxdmK8H0` | [Watch Video Demo](https://youtu.be/HqOVxdmK8H0) |
+| **Preprod Smart Contract** | `0x187ab583926a5ff2e4819242a95edc8dfa8ff784` | [Verify Contract on Midnight Preprod Explorer](https://explorer.preprod.midnight.network) |
+| **CI/CD Workflow** | `.github/workflows/ci.yml` | [View GitHub Actions Run](https://github.com/arisudan-lab/confidential-procurement-system/actions) |
 | **Repository** | `arisudan-lab/confidential-procurement-system` | [View on GitHub](https://github.com/arisudan-lab/confidential-procurement-system) |
+
+---
+
+## 🔑 Browser Wallet Connector (`window.midnight.mnLace`)
+```typescript
+// Connect directly to user's browser Midnight Lace Wallet extension
+public async connectWallet(): Promise<{ connected: boolean; walletAddress: string; walletName: string }> {
+  const provider = this.getBrowserWalletProvider();
+  if (!provider) {
+    throw new Error("Midnight Lace Wallet extension not detected. Please install and enable the extension.");
+  }
+  const connectedApi = await provider.connect('preprod');
+  const address = await connectedApi.getUnshieldedAddress();
+  return { connected: true, walletAddress: address.unshieldedAddress, walletName: provider.name };
+}
+```
 
 ---
 
