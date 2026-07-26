@@ -96,3 +96,6 @@
 
 ### Approved Supplier
 ![Approved Supplier](avproved_supplier.png)
+
+### Contract Deployment
+![Approved Supplier](screenshot.png)
