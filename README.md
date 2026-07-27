@@ -1,7 +1,7 @@
 # Confidential Procurement System
 > A Confidential Procurement System built on the Midnight Network using Compact smart contracts.
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel_Deployed-000000?style=flat-square&logo=vercel)](https://confidential-procurement-system-p50zjx47w.vercel.app/)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel_Deployed-000000?style=flat-square&logo=vercel)](https://confidential-procurement-system.vercel.app/)
 [![Demo Video](https://img.shields.io/badge/YouTube-Demo_Video-FF0000?style=flat-square&logo=youtube)](https://youtu.be/HqOVxdmK8H0)
 [![Midnight Preprod](https://img.shields.io/badge/Network-Midnight_Preprod-8b5cf6?style=flat-square)](https://explorer.preprod.midnight.network)
 [![Compact Language](https://img.shields.io/badge/Compact-v0.5.1-06b6d4?style=flat-square)](https://midnight.network)
@@ -11,7 +11,7 @@
 ---
 
 ## 🚀 Live Demo, Video & Repository
-- 🌐 **Live Web Application**: [https://confidential-procurement-system-p50zjx47w.vercel.app/](https://confidential-procurement-system-p50zjx47w.vercel.app/)
+- 🌐 **Live Web Application**: [https://confidential-procurement-system.vercel.app/](https://confidential-procurement-system.vercel.app/)
 - 📺 **YouTube Demo Video**: [https://youtu.be/HqOVxdmK8H0](https://youtu.be/HqOVxdmK8H0)
 - 📦 **GitHub Repository**: [https://github.com/arisudan-lab/confidential-procurement-system](https://github.com/arisudan-lab/confidential-procurement-system)
 
@@ -19,7 +19,7 @@
 
 ## 📋 Features & Functionality
 - [x] **Fully Functional Privacy dApp**: Meaningful use of Midnight's Zero-Knowledge privacy model for sealed-bid auctions.
-- [x] **Live Demo Deployment**: [Live Vercel Application](https://confidential-procurement-system-p50zjx47w.vercel.app/)
+- [x] **Live Demo Deployment**: [Live Vercel Application](https://confidential-procurement-system.vercel.app/)
 - [x] **Demo Video (Lace Wallet + ZK Circuit Call)**: [Watch on YouTube](https://youtu.be/HqOVxdmK8H0)
 - [x] **Public GitHub Repository**: [arisudan-lab/confidential-procurement-system](https://github.com/arisudan-lab/confidential-procurement-system)
 - [x] **Browser Wallet Integration**: Directly connects to user's Midnight Lace Wallet (`window.midnight.mnLace`).
@@ -46,7 +46,7 @@
 ## 🛠️ Contract & Live Deployment Details
 | Environment | Location / Address | Verification / Explorer Link |
 |---|---|---|
-| **Live Web App** | `https://confidential-procurement-system-p50zjx47w.vercel.app/` | [Open Live App](https://confidential-procurement-system-p50zjx47w.vercel.app/) |
+| **Live Web App** | `https://confidential-procurement-system.vercel.app/` | [Open Live App](https://confidential-procurement-system.vercel.app/) |
 | **Demo Video** | `https://youtu.be/HqOVxdmK8H0` | [Watch Video Demo](https://youtu.be/HqOVxdmK8H0) |
 | **Smart Contract** | Per-environment deployment (set `MIDNIGHT_CONTRACT_ADDRESS` when running the backend) | [Midnight Preprod Explorer](https://explorer.preprod.midnight.network) |
 | **CI/CD Workflow** | `.github/workflows/ci.yml` | [View GitHub Actions Run](https://github.com/arisudan-lab/confidential-procurement-system/actions) |
