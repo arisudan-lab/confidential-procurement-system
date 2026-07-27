@@ -10,8 +10,12 @@ let globalWalletCtx: WalletContext | null = null;
 export async function initWallet(): Promise<WalletContext> {
   const config = getNetworkConfig();
   
-  // Use genesis seed for local devnet backend wallet
-  const seed = '0000000000000000000000000000000000000000000000000000000000000001';
+  const seed = config.networkId === 'undeployed'
+    ? '0000000000000000000000000000000000000000000000000000000000000001'
+    : process.env.MIDNIGHT_WALLET_SEED?.trim();
+  if (!seed) {
+    throw new Error('MIDNIGHT_WALLET_SEED is required when the backend runs against preview or preprod.');
+  }
 
   logger.info(`Creating backend wallet on ${config.networkId}...`);
   globalWalletCtx = await createWallet({

@@ -12,8 +12,9 @@ import configRoutes from './routes/config.routes.js';
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+const allowedOrigin = process.env.FRONTEND_ORIGIN?.trim();
+app.use(cors({ origin: allowedOrigin || true }));
+app.use(express.json({ limit: '32kb' }));
 app.use(pinoHttp());
 
 app.use('/api/tenders', tenderRoutes);

@@ -3,6 +3,7 @@ import path from 'node:path';
 import { getContractAddress } from '../midnight/client.js';
 import { createProviders } from './providers.js';
 import { CompiledContract } from '@midnight-ntwrk/midnight-js-protocol/compact-js';
+import { findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts';
 import pino from 'pino';
 const logger = pino();
 let contractInterface = null;
@@ -14,9 +15,8 @@ export async function initializeContract(walletCtx) {
     activeContractAddress = address;
     // Resolve path to the compiled artifacts
     const __dirname = path.dirname(new URL(import.meta.url).pathname);
-    // Since we are in dist/contracts/, contracts/ is at ../../../../contracts/
-    const contractPath = path.resolve(__dirname, '../../../../contracts/managed/procurement/contract/index.mjs');
-    const zkConfigPath = path.resolve(__dirname, '../../../../contracts/managed/procurement/zkir');
+    const contractPath = path.resolve(__dirname, '../../../contracts/managed/procurement/contract/index.js');
+    const zkConfigPath = path.resolve(__dirname, '../../../contracts/managed/procurement/zkir');
     // Load the dynamic ESM module
     let Procurement;
     try {
@@ -50,4 +50,39 @@ export function getContract() {
         providers: currentProviders,
         compiledContract: currentCompiledContract
     };
+}
+export async function getBidCount() {
+    if (!currentProviders || !activeContractAddress)
+        throw new Error('Contract not initialized');
+    const __dirname = path.dirname(new URL(import.meta.url).pathname);
+    const contractPath = path.resolve(__dirname, '../../../contracts/managed/procurement/contract/index.js');
+    let Procurement = await import(pathToFileURL(contractPath).href);
+    const contractState = await currentProviders.publicDataProvider.queryContractState(activeContractAddress);
+    if (!contractState)
+        return "0";
+    const ledgerState = Procurement.ledger(contractState.data);
+    return ledgerState.bidCount.toString();
+}
+export async function submitBidContract(supplier, amount, secret, nonce) {
+    if (!currentProviders || !activeContractAddress)
+        throw new Error('Contract not initialized');
+    const __dirname = path.dirname(new URL(import.meta.url).pathname);
+    const contractPath = path.resolve(__dirname, '../../../contracts/managed/procurement/contract/index.js');
+    const zkConfigPath = path.resolve(__dirname, '../../../contracts/managed/procurement/zkir');
+    let Procurement = await import(pathToFileURL(contractPath).href);
+    const configuredContract = CompiledContract.make('procurement', Procurement.Contract).pipe(CompiledContract.withWitnesses({
+        getSupplier: (ctx) => [ctx.privateState, supplier],
+        getBidAmount: (ctx) => [ctx.privateState, amount],
+        getSecret: (ctx) => [ctx.privateState, secret],
+        getNonce: (ctx) => [ctx.privateState, nonce],
+    }), CompiledContract.withCompiledFileAssets(zkConfigPath));
+    // Dynamic contract artifacts do not preserve the generated circuit type at
+    // compile time. The SDK call is intentionally cast at this boundary.
+    const contract = await findDeployedContract(currentProviders, {
+        compiledContract: configuredContract,
+        contractAddress: activeContractAddress,
+        privateStateId: 'procurementPrivateState',
+    });
+    const tx = await contract.callTx.submitBid();
+    return tx;
 }

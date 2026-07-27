@@ -10,7 +10,7 @@ const asyncHandler = (fn: any) => (req: Request, res: Response, next: NextFuncti
 
 router.post('/submit', asyncHandler(async (req: Request, res: Response) => {
   const { amount, secret, supplier } = req.body;
-  if (!amount || !secret || !supplier) {
+  if (amount === undefined || !secret || !supplier) {
     return res.status(400).json({ success: false, message: 'Missing required fields' });
   }
 
@@ -22,7 +22,10 @@ router.post('/submit', asyncHandler(async (req: Request, res: Response) => {
     const supplierBytes = new Uint8Array(crypto.createHash('sha256').update(supplier).digest());
     const secretBytes = new Uint8Array(crypto.createHash('sha256').update(secret).digest());
     
-    const bidAmount = BigInt(Math.floor(Number(amount)));
+    if (!Number.isSafeInteger(Number(amount)) || Number(amount) <= 0) {
+      return res.status(400).json({ success: false, message: 'Bid amount must be a positive whole number.' });
+    }
+    const bidAmount = BigInt(Number(amount));
 
     // Generate ZK proof and call contract
     await submitBidContract(supplierBytes, bidAmount, secretBytes, nonce);

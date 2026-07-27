@@ -1,9 +1,18 @@
 import { Router } from 'express';
-import { getContract } from '../contracts/procurement.js';
+import { getContract, getBidCount } from '../contracts/procurement.js';
 const router = Router();
 const asyncHandler = (fn) => (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch(next);
 };
+router.get('/state', asyncHandler(async (req, res) => {
+    try {
+        const bidCount = await getBidCount();
+        res.json({ success: true, bidCount });
+    }
+    catch (err) {
+        res.status(500).json({ success: false, message: 'Failed to read contract state', error: err.message });
+    }
+}));
 router.post('/create', asyncHandler(async (req, res) => {
     const contractInfo = getContract();
     // NOTE: In the real integration, we'd use midnight-js-contracts to invoke the createTender circuit

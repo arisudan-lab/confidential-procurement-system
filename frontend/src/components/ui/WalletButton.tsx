@@ -10,9 +10,15 @@ export default function WalletButton({ className }: { className?: string }) {
     if (state.isConnected) {
       disconnect();
     } else {
-      connect();
+      void connect().catch(() => {
+        // WalletContext has already recorded a user-facing error state.
+      });
     }
   };
+
+  const displayAddress = state.address && state.address.length > 20
+    ? `${state.address.slice(0, 8)}...${state.address.slice(-6)}`
+    : state.address;
 
   return (
     <div className={cn("relative flex items-center", className)}>
@@ -72,7 +78,7 @@ export default function WalletButton({ className }: { className?: string }) {
             {state.isConnecting
               ? 'Connecting...'
               : state.isConnected
-              ? state.address
+              ? displayAddress
               : 'Connect Lace'}
           </span>
         </div>

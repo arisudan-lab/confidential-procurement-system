@@ -1,3 +1,5 @@
+import { MidnightConfig } from '../midnight/Config';
+
 export interface BidPayload {
   supplier: string;
   amount: number;
@@ -5,8 +7,8 @@ export interface BidPayload {
 }
 
 export class BidService {
-  private static API_URL = 'http://localhost:3001/api/bids';
-  private static TENDER_API_URL = 'http://localhost:3001/api/tenders';
+  private static get API_URL() { return `${MidnightConfig.apiUrl}/bids`; }
+  private static get TENDER_API_URL() { return `${MidnightConfig.apiUrl}/tenders`; }
 
   static async getBidCount(): Promise<string> {
     try {

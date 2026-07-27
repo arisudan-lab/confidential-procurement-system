@@ -5,7 +5,7 @@ import { laceWallet } from '../wallet/LaceWallet';
 
 interface WalletContextType {
   state: WalletState;
-  connect: () => Promise<void>;
+  connect: () => Promise<WalletState>;
   disconnect: () => void;
 }
 
@@ -43,7 +43,7 @@ export function WalletProvider({ children }: { children: ReactNode }) {
     checkConnection();
   }, []);
 
-  const connect = async () => {
+  const connect = async (): Promise<WalletState> => {
     setState(s => ({ ...s, isConnecting: true, error: null }));
     try {
       await laceWallet.connect();
@@ -51,18 +51,16 @@ export function WalletProvider({ children }: { children: ReactNode }) {
       const network = await laceWallet.getNetwork();
       
       // Basic formatting for display if it's raw hex, normally you'd use a library to parse the address
-      const formattedAddress = addressHex.length > 20 
-        ? `${addressHex.slice(0, 8)}...${addressHex.slice(-6)}`
-        : addressHex;
-
-      setState({
+      const nextState: WalletState = {
         isConnected: true,
-        address: formattedAddress,
+        address: addressHex,
         network,
         error: null,
         isConnecting: false,
         isMissing: false,
-      });
+      };
+      setState(nextState);
+      return nextState;
     } catch (error: any) {
       setState(s => ({
         ...s,

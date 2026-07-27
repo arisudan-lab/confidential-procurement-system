@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, Send, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { BidService } from '../../services/BidService';
 import { useWallet } from '../../contexts/WalletContext';
+import { expectedNetworkId, isExpectedNetwork } from '../../midnight/Network';
 
 export default function BidForm() {
   const { state: walletState, connect } = useWallet();
@@ -20,16 +21,17 @@ export default function BidForm() {
     setErrorMsg('');
     
     try {
-      if (!walletState.isConnected) {
+      let connectedWallet = walletState;
+      if (!connectedWallet.isConnected) {
         try {
-          await connect();
+          connectedWallet = await connect();
         } catch (err: any) {
           throw new Error('Wallet Rejection: You must connect and authorize the Lace wallet.');
         }
       }
 
-      if (walletState.network && walletState.network !== 'undeployed') {
-        throw new Error(`Network Mismatch: Please switch Lace to the 'undeployed' network.`);
+      if (!connectedWallet.network || !isExpectedNetwork(connectedWallet.network)) {
+        throw new Error(`Network mismatch: switch your wallet to '${expectedNetworkId()}'.`);
       }
 
       if (!amount || !notes || !company) {
@@ -38,7 +40,8 @@ export default function BidForm() {
 
       setStatus('loading');
 
-      const supplierAddress = walletState.address || 'unknown';
+      const supplierAddress = connectedWallet.address;
+      if (!supplierAddress) throw new Error('Wallet did not return an unshielded address.');
 
       await BidService.submitBid({
         supplier: supplierAddress,
