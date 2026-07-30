@@ -225,5 +225,4 @@ Set `FRONTEND_ORIGIN` on the backend to the exact Vercel origin so CORS accepts 
 ### Approved Supplier
 ![Approved Supplier](avproved_supplier.png)
 
-### Contract Deployment
-![Contract Deployment](screenshot.png)
+
