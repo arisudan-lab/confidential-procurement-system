@@ -1,1 +1,18 @@
+# Dependencies
 node_modules
+
+# Environment Variables (Security)
+.env
+.env.local
+
+# Build Outputs (Compiled Code)
+dist/
+build/
+
+# Midnight Runtime & Deployment State
+.midnight-state.json
+.midnight-wallet-state/
+midnight-level-db/
+
+# Logs
+*.log

@@ -154,7 +154,11 @@ async function main() {
     const elapsed = Math.round((Date.now() - syncStart) / 1000);
     process.stdout.write(`\r  ⏳ Still syncing... (${elapsed}s elapsed)   `);
   }, 5000);
-  const state = await walletCtx.wallet.waitForSyncedState();
+  const state = await Rx.firstValueFrom(
+    walletCtx.wallet.state().pipe(
+      Rx.filter((s) => s.isSynced)
+    )
+  );
   clearInterval(syncInterval);
   process.stdout.write('\r  ✓ Synced with network.                                      \n');
 
@@ -169,7 +173,7 @@ async function main() {
   if (network === 'undeployed' && balance === 0n) {
     console.error(
       '\n❌ Genesis-seed wallet has zero NIGHT. The devnet preset may not have minted to it.\n' +
-        '   Check `docker compose ps` and `docker compose logs node`. Then `docker compose down -v` and retry.\n',
+      '   Check `docker compose ps` and `docker compose logs node`. Then `docker compose down -v` and retry.\n',
     );
     await walletCtx.wallet.stop();
     process.exit(1);

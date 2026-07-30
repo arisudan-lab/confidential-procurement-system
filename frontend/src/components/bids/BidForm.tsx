@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lock, Send, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Lock, Send, Loader2, CheckCircle2, AlertCircle, Zap } from 'lucide-react';
+import { ContractService, ContractError } from '../../services/ContractService';
 import { BidService } from '../../services/BidService';
 import { useWallet } from '../../contexts/WalletContext';
 import { expectedNetworkId, isExpectedNetwork } from '../../midnight/Network';
@@ -15,23 +16,32 @@ export default function BidForm() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
   const [bidCount, setBidCount] = useState<string>('0');
+  const [txHash, setTxHash] = useState<string | null>(null);
+  const [proofMethod, setProofMethod] = useState<'contract' | 'backend'>('contract');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
+    setTxHash(null);
     
     try {
       let connectedWallet = walletState;
       if (!connectedWallet.isConnected) {
         try {
           connectedWallet = await connect();
-        } catch (err: any) {
-          throw new Error('Wallet Rejection: You must connect and authorize the Lace wallet.');
+        } catch {
+          throw new ContractError(
+            'Wallet Rejection: You must connect and authorize the Lace wallet.',
+            'WALLET_REJECTED'
+          );
         }
       }
 
       if (!connectedWallet.network || !isExpectedNetwork(connectedWallet.network)) {
-        throw new Error(`Network mismatch: switch your wallet to '${expectedNetworkId()}'.`);
+        throw new ContractError(
+          `Network mismatch: switch your wallet to '${expectedNetworkId()}'.`,
+          'NETWORK_MISMATCH'
+        );
       }
 
       if (!amount || !notes || !company) {
@@ -43,19 +53,43 @@ export default function BidForm() {
       const supplierAddress = connectedWallet.address;
       if (!supplierAddress) throw new Error('Wallet did not return an unshielded address.');
 
-      await BidService.submitBid({
-        supplier: supplierAddress,
-        amount: Number(amount),
-        secret: notes
-      });
+      if (proofMethod === 'contract') {
+        // ─── Direct Contract Interaction (L2) ───────────────────────
+        // This path invokes callTx.submitBid() through the Midnight
+        // DApp Connector API → Lace wallet → ZK proof → network.
+        const result = await ContractService.submitBid({
+          supplier: supplierAddress,
+          amount: Number(amount),
+          secret: notes,
+        });
 
-      const updatedCount = await BidService.getBidCount();
-      setBidCount(updatedCount);
+        setTxHash(result.txHash);
+
+        // Read updated bid count from the on-chain ledger
+        const count = await ContractService.getBidCount();
+        setBidCount(count);
+      } else {
+        // ─── Backend Relay (fallback) ───────────────────────────────
+        await BidService.submitBid({
+          supplier: supplierAddress,
+          amount: Number(amount),
+          secret: notes,
+        });
+
+        const updatedCount = await BidService.getBidCount();
+        setBidCount(updatedCount);
+      }
+
       setStatus('success');
     } catch (err: any) {
       console.error(err);
       setStatus('error');
-      setErrorMsg(err.message || 'Proof failure or network error occurred.');
+
+      if (err instanceof ContractError) {
+        setErrorMsg(`[${err.type}] ${err.message}`);
+      } else {
+        setErrorMsg(err.message || 'Proof failure or network error occurred.');
+      }
     }
   };
 
@@ -68,13 +102,25 @@ export default function BidForm() {
         <h2 className="text-2xl font-bold text-white">Bid Submitted Successfully</h2>
         <p className="text-slate-400">Your zero-knowledge proof was verified and the encrypted bid was accepted by the Compact contract.</p>
         
+        {txHash && (
+          <div className="p-3 bg-midnight-900/50 rounded-lg border border-white/5 text-left">
+            <div className="text-xs font-medium text-slate-500 mb-1">Transaction Hash</div>
+            <div className="text-sm font-mono text-accent-cyan break-all">{txHash}</div>
+          </div>
+        )}
+
         <div className="p-4 bg-midnight-900/50 rounded-xl border border-white/5 inline-block min-w-48 my-4">
           <div className="text-sm font-medium text-slate-400">Global Tender Bids</div>
           <div className="text-3xl font-mono font-bold text-accent-cyan mt-1">{bidCount}</div>
         </div>
 
+        <div className="flex items-center justify-center gap-2 text-xs text-slate-500">
+          <Zap className="w-3 h-3" />
+          <span>Submitted via {proofMethod === 'contract' ? 'Direct L2 Contract Call' : 'Backend Relay'}</span>
+        </div>
+
         <div>
-          <button onClick={() => setStatus('idle')} className="btn-primary px-8 py-3">Submit Another</button>
+          <button onClick={() => { setStatus('idle'); setTxHash(null); }} className="btn-primary px-8 py-3">Submit Another</button>
         </div>
       </motion.div>
     );
@@ -90,8 +136,14 @@ export default function BidForm() {
       {status === 'loading' && (
         <div className="absolute inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl">
           <Loader2 className="w-12 h-12 text-accent-purple animate-spin mb-4" />
-          <p className="text-lg font-medium text-white">Generating Zero-Knowledge Proof...</p>
-          <p className="text-sm text-slate-400 mt-2">This may take up to 30 seconds.</p>
+          <p className="text-lg font-medium text-white">
+            {proofMethod === 'contract' ? 'Invoking Compact Circuit...' : 'Generating Zero-Knowledge Proof...'}
+          </p>
+          <p className="text-sm text-slate-400 mt-2">
+            {proofMethod === 'contract'
+              ? 'callTx.submitBid() → Prove → Balance → Submit'
+              : 'This may take up to 30 seconds.'}
+          </p>
         </div>
       )}
 
@@ -101,6 +153,33 @@ export default function BidForm() {
         </div>
         <h2 className="text-2xl font-bold text-white">Submit Confidential Bid</h2>
         <p className="text-sm text-slate-400">Your bid details are protected by Midnight ZK proofs.</p>
+      </div>
+
+      {/* Proof Method Toggle */}
+      <div className="flex items-center justify-center gap-2 p-1 bg-midnight-900/50 rounded-lg border border-white/5 w-fit mx-auto">
+        <button
+          type="button"
+          onClick={() => setProofMethod('contract')}
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+            proofMethod === 'contract'
+              ? 'bg-accent-purple/20 text-accent-purple border border-accent-purple/30'
+              : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          <Zap className="w-3.5 h-3.5 inline-block mr-1.5 -mt-0.5" />
+          Direct L2
+        </button>
+        <button
+          type="button"
+          onClick={() => setProofMethod('backend')}
+          className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+            proofMethod === 'backend'
+              ? 'bg-accent-cyan/20 text-accent-cyan border border-accent-cyan/30'
+              : 'text-slate-400 hover:text-white'
+          }`}
+        >
+          Backend Relay
+        </button>
       </div>
 
       <AnimatePresence>

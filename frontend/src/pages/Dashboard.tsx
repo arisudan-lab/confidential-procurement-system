@@ -61,7 +61,7 @@ export default function Dashboard() {
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
                 <XAxis dataKey="name" stroke="rgba(255,255,255,0.2)" fontSize={12} tickMargin={10} />
-                <YAxis stroke="rgba(255,255,255,0.2)" fontSize={12} tickFormatter={(val) => `${val}`} />
+                <YAxis stroke="rgba(255,255,255,0.2)" fontSize={12} tickFormatter={(val: number) => `${val}`} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#1c1f2e', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
                   itemStyle={{ color: '#fff' }}
